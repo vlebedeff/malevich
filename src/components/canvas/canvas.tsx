@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { CanvasFigure } from "./canvas_figure";
+import { CanvasFigureContainer } from "../../redux/containers/canvas_figure_container";
 import { Figure } from "../../models/figure";
 
 export interface StateProps { figures: Figure[] }
@@ -28,7 +28,7 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
            className="mv-canvas"
            onDrop={this.onDrop}
            onDragOver={this.props.onDragOver}>
-        {figures.map((figure, i) => <CanvasFigure key={i} figure={figure} />)}
+        {figures.map((figure, i) => <CanvasFigureContainer key={i} figureId={i} />)}
       </svg>
     )
   }

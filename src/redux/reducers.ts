@@ -34,6 +34,16 @@ export function figures(): Reducer<CanvasState> {
         var figures = state.figures;
         return { figures: [ figures[index], ...figuresExcept(figures, index) ] }
 
+      case Actions.MOVE_FIGURE:
+        var { index, x, y } = (action as Actions.MoveFigureAction);
+        return {
+          figures: [
+            ...state.figures.slice(0, index),
+            new Figure({ shape: state.figures[index].shape, x: x, y: y}),
+            ...state.figures.slice(index + 1)
+          ]
+        }
+
       default:
         return state;
     }

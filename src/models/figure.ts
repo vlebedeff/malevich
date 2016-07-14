@@ -1,14 +1,22 @@
 export interface FigureData {
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  x?: number,
+  y?: number,
+  width?: number,
+  height?: number,
   shape: string
 }
 
 export class Figure implements FigureData {
 
-  constructor(private data: FigureData) {}
+  static defaultSize: number = 128;
+
+  constructor(private data: FigureData) {
+    this.data.shape = data.shape;
+    this.data.x = data.x || 0;
+    this.data.y = data.y || 0;
+    this.data.width = data.width || Figure.defaultSize;
+    this.data.height = data.height || Figure.defaultSize;
+  }
 
   get x(): number { return this.data.x }
 
