@@ -4,3 +4,9 @@
   margin-left: 100px;
   background-color: #fff;
 }
+
+.mv-canvas--figure {
+  fill: #aaa;
+  stroke: #000;
+  stroke-width: 1px;
+}
