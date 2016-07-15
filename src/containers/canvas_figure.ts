@@ -1,9 +1,9 @@
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-import { CanvasState } from "../state";
-import { moveFigure } from "../actions";
-import { CanvasFigure, StateProps, DispatchProps } from "../../components/canvas/canvas_figure";
+import { CanvasState } from "../redux/state";
+import { moveFigure } from "../redux/actions";
+import { CanvasFigure, StateProps, DispatchProps } from "../components/canvas/canvas_figure";
 
 interface CanvasContainerProps { figureId: number }
 
@@ -27,4 +27,6 @@ const mapDispatchToProps = (
   };
 }
 
-export const CanvasFigureContainer = connect(mapStateToProps, mapDispatchToProps)(CanvasFigure);
+const container = connect(mapStateToProps, mapDispatchToProps)(CanvasFigure);
+
+export { container as CanvasFigure };

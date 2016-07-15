@@ -1,10 +1,10 @@
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-import { CanvasState } from "../state";
-import { addFigure } from "../actions";
+import { CanvasState } from "../redux/state";
+import { addFigure } from "../redux/actions";
 
-import { Canvas, StateProps, DispatchProps } from "../../components/canvas/canvas";
+import { Canvas, StateProps, DispatchProps } from "../components/canvas/canvas";
 
 const mapStateToProps = (state: CanvasState): StateProps => {
   return {
@@ -31,4 +31,6 @@ const mapDispatchToProps = (dispatch: Dispatch<CanvasState>): DispatchProps => {
   }
 }
 
-export const CanvasContainer = connect(mapStateToProps, mapDispatchToProps)(Canvas);
+const container = connect(mapStateToProps, mapDispatchToProps)(Canvas);
+
+export { container as Canvas };
