@@ -28,7 +28,9 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
            className="mv-canvas"
            onDrop={this.onDrop}
            onDragOver={this.props.onDragOver}>
-        {figures.map((figure, i) => <CanvasFigure key={i} figureId={i} />)}
+         <g>
+          {figures.map((figure, i) => <CanvasFigure key={i} figureId={i} />)}
+         </g>
       </svg>
     )
   }
