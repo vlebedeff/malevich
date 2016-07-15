@@ -1,0 +1,37 @@
+.mv-palette {
+  width: 100px;
+  position: absolute;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    border-top: 1px solid #444;
+
+    &:last-child {
+      border-bottom: 1px solid #444;
+    }
+  }
+}
+
+.mv-palette--asset {
+  cursor: move;
+  width: 100px;
+  height: 100px;
+
+  svg {
+    width: 100px;
+    height: 100px;
+    fill: #aaa;
+    stroke: #000;
+    stroke-width: 2;
+    pointer-events: none;
+
+    &:hover {
+      fill: #ddd;
+    }
+  }
+}

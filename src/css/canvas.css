@@ -1,0 +1,12 @@
+.mv-canvas {
+  width: 100%;
+  height: 100%;
+  margin-left: 100px;
+  background-color: #fff;
+}
+
+.mv-canvas--figure {
+  fill: #aaa;
+  stroke: #000;
+  stroke-width: 1px;
+}
