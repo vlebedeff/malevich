@@ -4,6 +4,7 @@
   "description": "TypeScript / React / HTML5 Training Exercise",
   "main": "./dist/bundle.js",
   "scripts": {
+    "postinstall": "typings install --global --save dt~react dt~react-dom dt~redux dt~react-redux",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
