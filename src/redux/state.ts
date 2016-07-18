@@ -1,5 +1,6 @@
 import { Figure } from "../models/figure";
 
 export interface CanvasState {
-  figures: Figure[]
+  figures: Figure[],
+  selectedFigures: number[]
 }

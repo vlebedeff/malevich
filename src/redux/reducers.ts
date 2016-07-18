@@ -5,55 +5,73 @@ import * as Actions from "./actions";
 
 export function figures(): Reducer<CanvasState> {
   const initialState = {
-    figures: new Array<Figure>()
-  };
-
-  const figuresExcept = (figures: Figure[], index: number): Figure[] => {
-    return figures.slice(0, index).concat(figures.slice(index + 1));
+    figures: new Array<Figure>(),
+    selectedFigures: new Array<number>()
   };
 
   return (state: CanvasState = initialState, action: Action) => {
     switch(action.type) {
       case Actions.ADD_FIGURE:
+        let newFigure = (<Actions.AddFigureAction>action).figure;
         return {
-          figures: [ ...state.figures, (<Actions.AddFigureAction>action).figure ]
+          figures: [ ...state.figures, newFigure],
+          selectedFigures: [newFigure.id]
         }
 
       case Actions.REMOVE_FIGURE:
+        let removedId = (<Actions.RemoveFigureAction>action).id;
         return {
-          figures: figuresExcept(
-            state.figures,
-            (<Actions.RemoveFigureAction>action).index
-          )
+          figures: state.figures.filter(figure => figure.id != removedId),
+          selectedFigures: state.selectedFigures.filter(id => id != removedId)
         }
 
-      case Actions.PULL_UP_FIGURE:
-        let pullUpAction = (<Actions.PullUpFigureAction>action);
+      case Actions.SELECT_FIGURE:
+        let { id, exclusive } = (<Actions.SelectFigureAction>action);
         return {
-          figures: [
-            ...figuresExcept(state.figures, pullUpAction.index),
-            state.figures[pullUpAction.index]
-          ]
+          figures: state.figures,
+          selectedFigures: exclusive ? [id] : [ ...state.selectedFigures, id ]
         }
 
-      case Actions.PUSH_DOWN_FIGURE:
-        let pushDownAction = (<Actions.PushDownFigureAction>action);
+      case Actions.MOVE_FIGURES:
+        let { deltaX, deltaY } = (<Actions.MoveFiguresAction>action);
         return {
-          figures: [
-            state.figures[pushDownAction.index],
-            ...figuresExcept(state.figures, pushDownAction.index)
-          ]
+          figures: state.figures.map((figure) => {
+            if (state.selectedFigures.indexOf(figure.id) != -1) {
+              return new Figure({
+                id: figure.id,
+                shape: figure.shape,
+                x: figure.x + deltaX,
+                y: figure.y + deltaY
+              })
+            } else {
+              return figure;
+            }
+          }),
+          selectedFigures: state.selectedFigures
         }
 
-      case Actions.MOVE_FIGURE:
-        let { index, x, y } = (<Actions.MoveFigureAction>action);
-        let { id, shape } = state.figures[index];
+      case Actions.DESELECT_ALL:
+        return {
+          figures: state.figures,
+          selectedFigures: new Array<number>()
+        } 
+
+      case Actions.BRING_TO_FRONT:
         return {
           figures: [
-            ...state.figures.slice(0, index),
-            new Figure({ id: id, shape: shape, x: x, y: y }),
-            ...state.figures.slice(index + 1)
-          ]
+            ...state.figures.filter(figure => state.selectedFigures.indexOf(figure.id) == -1),
+            ...state.figures.filter(figure => state.selectedFigures.indexOf(figure.id) != -1)
+          ],
+          selectedFigures: state.selectedFigures
+        }
+
+      case Actions.BRING_TO_BOTTOM:
+        return {
+          figures: [
+            ...state.figures.filter(figure => state.selectedFigures.indexOf(figure.id) != -1),
+            ...state.figures.filter(figure => state.selectedFigures.indexOf(figure.id) == -1)
+          ],
+          selectedFigures: state.selectedFigures
         }
 
       default:

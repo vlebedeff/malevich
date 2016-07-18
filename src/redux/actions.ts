@@ -3,9 +3,11 @@ import { Figure } from "../models/figure";
 
 export const ADD_FIGURE = "ADD_FIGURE";
 export const REMOVE_FIGURE = "REMOVE_FIGURE";
-export const PULL_UP_FIGURE = "PULL_UP_FIGURE";
-export const PUSH_DOWN_FIGURE = "PUSH_DOWN_FIGURE";
-export const MOVE_FIGURE = "MOVE_FIGURE";
+export const MOVE_FIGURES = "MOVE_FIGURES";
+export const SELECT_FIGURE = "SELECT_FIGURE";
+export const DESELECT_ALL = "DESELECT_ALL";
+export const BRING_TO_FRONT = "BRING_TO_FRONT";
+export const BRING_TO_BOTTOM = "BRING_TO_BOTTOM";
 
 export interface AddFigureAction extends Action { figure: Figure }
 export function addFigure(shape: string, x: number, y: number): AddFigureAction {
@@ -19,27 +21,37 @@ export function addFigure(shape: string, x: number, y: number): AddFigureAction 
   };
 }
 
-export interface RemoveFigureAction extends Action { index: number }
-export function removeFigure(index: number): RemoveFigureAction {
-  return { index: index, type: REMOVE_FIGURE };
+export interface RemoveFigureAction extends Action { id: number }
+export function removeFigure(id: number): RemoveFigureAction {
+  return { id: id, type: REMOVE_FIGURE };
 }
 
-export interface PullUpFigureAction extends Action { index: number }
-export function pullUpFigure(index: number): PullUpFigureAction {
-  return { index: index, type: PULL_UP_FIGURE };
-}
-
-export interface PushDownFigureAction extends Action { index: number }
-export function pushDownFigure(index: number): PullUpFigureAction {
-  return { index: index, type: PUSH_DOWN_FIGURE };
-}
-
-export interface MoveFigureAction extends Action { index: number, x: number, y: number }
-export function moveFigure(index: number, x: number, y: number): MoveFigureAction {
+export interface MoveFiguresAction extends Action { deltaX: number, deltaY: number }
+export function moveFigures(deltaX: number, deltaY: number): MoveFiguresAction {
   return {
-    index: index,
-    x: x,
-    y: y,
-    type: MOVE_FIGURE
+    deltaX: deltaX,
+    deltaY: deltaY,
+    type: MOVE_FIGURES
   };
+}
+
+export interface SelectFigureAction extends Action { id: number, exclusive: boolean }
+export function selectFigure(id: number, exclusive: boolean): SelectFigureAction {
+  return {
+    id: id,
+    exclusive: exclusive,
+    type: SELECT_FIGURE
+  }
+}
+
+export function deselectAll(): Action {
+  return { type: DESELECT_ALL }
+}
+
+export function bringToFront(): Action {
+  return { type: BRING_TO_FRONT };
+}
+
+export function bringToBottom(): Action {
+  return { type: BRING_TO_BOTTOM };
 }

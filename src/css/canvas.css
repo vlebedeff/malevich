@@ -10,3 +10,9 @@
   stroke: #000;
   stroke-width: 1px;
 }
+
+.mv-canvas--selection {
+  fill: transparent;
+  stroke: blue;
+  stroke-width: 1px;
+}

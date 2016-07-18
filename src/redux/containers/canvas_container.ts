@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
 import { CanvasState } from "../state";
-import { addFigure, moveFigure, pullUpFigure, pushDownFigure } from "../actions";
+import * as Actions from "../actions";
 
 import { Canvas, StateProps, DispatchProps } from "../../components/canvas/canvas";
 
@@ -21,7 +21,7 @@ const mapDispatchToProps = (dispatch: Dispatch<CanvasState>): DispatchProps => {
     onDrop: (e: DragEvent, clientRect: ClientRect) => {
       e.preventDefault();
       dispatch(
-        addFigure(
+        Actions.addFigure(
           e.dataTransfer.getData("shape"),
           e.clientX - clientRect.left,
           e.clientY - clientRect.top
@@ -29,28 +29,24 @@ const mapDispatchToProps = (dispatch: Dispatch<CanvasState>): DispatchProps => {
       );
     },
 
-    onFigureMove: (index: number) => {
-      return (x: number, y: number) => {
-        dispatch(
-          moveFigure(index, x, y)
-        );
-      }
+    onFigureMouseDown: (id: number, shiftKey: boolean) => {
+      dispatch(Actions.selectFigure(id, !shiftKey));
     },
 
-    onFigureDoubleClick: (index: number) => {
-      return () => {
-        dispatch(
-          pullUpFigure(index)
-        );
-      }
+    onMove: (deltaX: number, deltaY: number) => {
+      dispatch(Actions.moveFigures(deltaX, deltaY));
     },
 
-    onFigureAltDoubleClick: (index: number) => {
-      return () => {
-        dispatch(
-          pushDownFigure(index)
-        );
-      }
+    onCanvasMouseDown: () => {
+      dispatch(Actions.deselectAll());
+    },
+
+    onCmdUp: () => {
+      dispatch(Actions.bringToFront());
+    },
+
+    onCmdDown: () => {
+      dispatch(Actions.bringToBottom());
     }
   }
 }
