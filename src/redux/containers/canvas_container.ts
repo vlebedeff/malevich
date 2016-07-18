@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
 import { CanvasState } from "../state";
-import { addFigure } from "../actions";
+import { addFigure, moveFigure, pullUpFigure, pushDownFigure } from "../actions";
 
 import { Canvas, StateProps, DispatchProps } from "../../components/canvas/canvas";
 
@@ -27,6 +27,30 @@ const mapDispatchToProps = (dispatch: Dispatch<CanvasState>): DispatchProps => {
           e.clientY - clientRect.top
         )
       );
+    },
+
+    onFigureMove: (index: number) => {
+      return (x: number, y: number) => {
+        dispatch(
+          moveFigure(index, x, y)
+        );
+      }
+    },
+
+    onFigureDoubleClick: (index: number) => {
+      return () => {
+        dispatch(
+          pullUpFigure(index)
+        );
+      }
+    },
+
+    onFigureAltDoubleClick: (index: number) => {
+      return () => {
+        dispatch(
+          pushDownFigure(index)
+        );
+      }
     }
   }
 }
