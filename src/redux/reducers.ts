@@ -28,34 +28,34 @@ export function figures(): Reducer<CanvasState> {
         }
 
       case Actions.PULL_UP_FIGURE:
-        let pull_up_action = (<Actions.PullUpFigureAction>action);
+        let pullUpAction = (<Actions.PullUpFigureAction>action);
         return {
           figures: [
-            ...figuresExcept(state.figures, pull_up_action.index),
-            state.figures[pull_up_action.index]
+            ...figuresExcept(state.figures, pullUpAction.index),
+            state.figures[pullUpAction.index]
           ]
         }
 
       case Actions.PUSH_DOWN_FIGURE:
-        let push_down_action = (<Actions.PushDownFigureAction>action);
+        let pushDownAction = (<Actions.PushDownFigureAction>action);
         return {
           figures: [
-            state.figures[push_down_action.index],
-            ...figuresExcept(state.figures, push_down_action.index)
+            state.figures[pushDownAction.index],
+            ...figuresExcept(state.figures, pushDownAction.index)
           ]
         }
 
       case Actions.MOVE_FIGURE:
-        let move_action = (<Actions.MoveFigureAction>action);
+        let moveAction = (<Actions.MoveFigureAction>action);
         return {
           figures: [
-            ...state.figures.slice(0, move_action.index),
+            ...state.figures.slice(0, moveAction.index),
             new Figure({
-              shape: state.figures[move_action.index].shape,
-              x: move_action.x,
-              y: move_action.y
+              shape: state.figures[moveAction.index].shape,
+              x: moveAction.x,
+              y: moveAction.y
             }),
-            ...state.figures.slice(move_action.index + 1)
+            ...state.figures.slice(moveAction.index + 1)
           ]
         }
 
