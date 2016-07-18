@@ -2,14 +2,14 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
 import { CanvasState } from "../state";
-import { moveFigure } from "../actions";
+import { moveFigure, pullUpFigure, pushDownFigure } from "../actions";
 import { CanvasFigure, StateProps, DispatchProps } from "../../components/canvas/canvas_figure";
 
-interface CanvasContainerProps { figureId: number }
+interface CanvasContainerProps { index: number }
 
 const mapStateToProps = (state: CanvasState, ownProps: CanvasContainerProps): StateProps => {
   return {
-    figure: state.figures[ownProps.figureId]
+    figure: state.figures[ownProps.index]
   }
 }
 
@@ -21,7 +21,19 @@ const mapDispatchToProps = (
   return {
     onMove: (x: number, y: number): void => {
       dispatch(
-        moveFigure(ownProps.figureId, x, y)
+        moveFigure(ownProps.index, x, y)
+      );
+    },
+
+    onDoubleClick: (): void => {
+      dispatch(
+        pullUpFigure(ownProps.index)
+      );
+    },
+
+    onAltDoubleClick: (): void => {
+      dispatch(
+        pushDownFigure(ownProps.index)
       );
     }
   };
