@@ -13,14 +13,14 @@ interface ContainerProps {
 }
 
 const mapStateToProps = (state: CanvasState, ownProps: ContainerProps): SelectionProps & ContainerProps => {
-  if (state.selectedFigures.length == 0) {
+  if (state.selection.figureIds.length == 0) {
     return { x: 0, y: 0, width: 0, height: 0, onMouseDown: ownProps.onMouseDown };
   } else {
     let x = Infinity;
     let y = Infinity;
     let bottomRightX = 0;
     let bottomRightY = 0;
-    let selectedFigures = state.figures.filter(figure => state.selectedFigures.indexOf(figure.id) != -1)
+    let selectedFigures = state.figures.filter(figure => state.selection.figureIds.indexOf(figure.id) != -1)
     for (let figure of selectedFigures) {
       x = Math.min(x, figure.x);
       y = Math.min(y, figure.y);
@@ -28,9 +28,10 @@ const mapStateToProps = (state: CanvasState, ownProps: ContainerProps): Selectio
       bottomRightY = Math.max(bottomRightY, figure.y + figure.height);
     }
     const padding = 1;
+    const { deltaX, deltaY } = state.selection.transform;
     return {
-      x: x - padding,
-      y: y - padding,
+      x: x + deltaX - padding,
+      y: y + deltaY - padding,
       width: bottomRightX - x + padding * 2,
       height: bottomRightY - y + padding * 2,
       onMouseDown: ownProps.onMouseDown

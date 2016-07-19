@@ -34,3 +34,28 @@ export class Figure implements FigureData {
 
   get shape(): string { return this.data.shape }
 }
+
+export interface Transform {
+  deltaX: number,
+  deltaY: number
+}
+
+export class TransformedFigure implements FigureData {
+
+  constructor(private figure: Figure, private transform: Transform) {
+    this.figure = figure;
+    this.transform = transform;
+  }
+
+  get id() { return this.figure.id }
+
+  get shape() { return this.figure.shape }
+
+  get x() { return this.figure.x + this.transform.deltaX }
+
+  get y() { return this.figure.y + this.transform.deltaY }
+
+  get width() { return this.figure.width }
+
+  get height() { return this.figure.height }
+}

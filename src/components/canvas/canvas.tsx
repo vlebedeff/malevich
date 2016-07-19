@@ -1,17 +1,21 @@
 import * as React from "react";
 
 import { CanvasFigure } from "./canvas_figure";
-import { Figure } from "../../models/figure";
+import { TransformedFigure, Transform } from "../../models";
 import Selection from "./selection";
 
-export interface StateProps { figures: Figure[] }
+export interface StateProps {
+  figures: TransformedFigure[]
+}
+
 export interface DispatchProps {
   onDragOver: (e: DragEvent) => void,
   onDrop: (e: DragEvent, clientRect: ClientRect) => void,
   onCmdUp: () => void,
   onCmdDown: () => void,
   onFigureMouseDown: (id: number, shiftKey: boolean) => void,
-  onMove: (deltaX: number, deltaY: number) => void,
+  onMove: (transform: Transform) => void,
+  onMoveEnd: () => void,
   onCanvasMouseDown: () => void
 }
 
@@ -27,16 +31,16 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
     super(props);
 
     this.motionListener = (e: MouseEvent) => {
-      let deltaX = e.clientX - this.capturePoint.x;
-      let deltaY = e.clientY - this.capturePoint.y;
-      this.props.onMove(deltaX, deltaY);
-
-      this.capturePoint = { x: e.clientX, y: e.clientY };
+      this.props.onMove({
+        deltaX: e.clientX - this.capturePoint.x,
+        deltaY: e.clientY - this.capturePoint.y
+      });
     }
 
     this.stopListener = (e: MouseEvent) => {
       window.removeEventListener('mousemove', this.motionListener);
       window.removeEventListener('mouseup', this.stopListener);
+      this.props.onMoveEnd();
     }
 
     window.onkeydown = (e: KeyboardEvent) => {
@@ -73,8 +77,11 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
            onDrop={this.onDrop}
            onDragOver={this.props.onDragOver}
            onMouseDown={this.onMouseDown}>
-        {figures.map((figure, i) => <CanvasFigure key={figure.id} figure={figure}
-                     onMouseDown={this.onFigureMouseDown(figure.id)} />)}
+        {figures.map((figure, i) => (
+          <CanvasFigure key={figure.id}
+                        figure={figure}
+                        onMouseDown={this.onFigureMouseDown(figure.id)} />
+        ))}
         <Selection onMouseDown={this.selectionOnMouseDown} />
       </svg>
     )

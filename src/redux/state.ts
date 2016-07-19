@@ -1,6 +1,11 @@
-import { Figure } from "../models/figure";
+import { Figure, Transform } from "../models";
+
+export interface SelectionState {
+  figureIds: number[],
+  transform: Transform
+}
 
 export interface CanvasState {
   figures: Figure[],
-  selectedFigures: number[]
+  selection: SelectionState
 }

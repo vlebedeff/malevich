@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { Figure } from "../models/figure";
+import { Figure, Transform } from "../models";
 
 export const ADD_FIGURE = "ADD_FIGURE";
 export const REMOVE_FIGURE = "REMOVE_FIGURE";
@@ -8,6 +8,8 @@ export const SELECT_FIGURE = "SELECT_FIGURE";
 export const DESELECT_ALL = "DESELECT_ALL";
 export const BRING_TO_FRONT = "BRING_TO_FRONT";
 export const BRING_TO_BOTTOM = "BRING_TO_BOTTOM";
+export const TRANSFORM_SELECTION = "TRANSFORM_SELECTION";
+export const APPLY_TRANSFORMATION = "APPLY_TRANSFORMATION";
 
 export interface AddFigureAction extends Action { figure: Figure }
 export function addFigure(shape: string, x: number, y: number): AddFigureAction {
@@ -54,4 +56,16 @@ export function bringToFront(): Action {
 
 export function bringToBottom(): Action {
   return { type: BRING_TO_BOTTOM };
+}
+
+export interface TransformSelectionAction extends Action { transform: Transform }
+export function transformSelection(transform: Transform): TransformSelectionAction {
+  return {
+    transform: transform,
+    type: TRANSFORM_SELECTION
+  }
+}
+
+export function applyTransformation(): Action {
+  return { type: APPLY_TRANSFORMATION }
 }

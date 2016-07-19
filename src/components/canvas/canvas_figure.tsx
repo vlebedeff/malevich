@@ -1,7 +1,9 @@
 import * as React from "react";
-import { Figure } from "../../models/figure";
+import { TransformedFigure } from "../../models";
 
-export interface StateProps { figure: Figure }
+export interface StateProps {
+  figure: TransformedFigure
+}
 export interface DispatchProps {
   onMouseDown: (e: MouseEvent) => void
 }
