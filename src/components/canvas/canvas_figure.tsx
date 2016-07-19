@@ -3,7 +3,9 @@ import { Figure } from "../../models/figure";
 
 export interface StateProps { figure: Figure }
 export interface DispatchProps {
-  onMove: (x: number, y: number) => void
+  onMove: (x: number, y: number) => void,
+  onDoubleClick: () => void,
+  onAltDoubleClick: () => void
 }
 
 interface Point {
@@ -31,8 +33,8 @@ export class CanvasFigure extends React.Component<StateProps & DispatchProps, {}
     }
 
     this.stopListener = (e: MouseEvent) => {
-      this.getParent().removeEventListener('mousemove', this.motionListener);
-      this.getParent().removeEventListener('mouseup', this.stopListener);
+      window.removeEventListener('mousemove', this.motionListener);
+      window.removeEventListener('mouseup', this.stopListener);
       if (this.wasMoved()) {
         this.props.onMove(+this.getAttribute("x"), +this.getAttribute("y"));
       }
@@ -46,8 +48,16 @@ export class CanvasFigure extends React.Component<StateProps & DispatchProps, {}
 
   onMouseDown = (e: MouseEvent) => {
     this.capturePoint = { x: e.clientX, y: e.clientY }
-    this.getParent().addEventListener('mousemove', this.motionListener);
-    this.getParent().addEventListener('mouseup', this.stopListener);
+    window.addEventListener('mousemove', this.motionListener);
+    window.addEventListener('mouseup', this.stopListener);
+  }
+
+  onDoubleClick = (e: MouseEvent) => {
+    if (e.altKey) {
+      this.props.onAltDoubleClick();
+    } else {
+      this.props.onDoubleClick();
+    }
   }
 
   public render(): JSX.Element {
@@ -61,12 +71,9 @@ export class CanvasFigure extends React.Component<StateProps & DispatchProps, {}
            width={figure.width}
            height={figure.height}
            ref="figure"
-           onMouseDown={this.onMouseDown} />
+           onMouseDown={this.onMouseDown}
+           onDoubleClick={this.onDoubleClick} />
     );
-  }
-
-  private getParent = (): Node => {
-    return this.refs.figure.parentNode;
   }
 
   private getAttribute = (key: string): string => {

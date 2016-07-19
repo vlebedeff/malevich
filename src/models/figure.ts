@@ -1,4 +1,5 @@
 export interface FigureData {
+  id?: number,
   x?: number,
   y?: number,
   width?: number,
@@ -11,12 +12,17 @@ export class Figure implements FigureData {
   static defaultSize: number = 128;
 
   constructor(private data: FigureData) {
-    this.data.shape = data.shape;
-    this.data.x = data.x || 0;
-    this.data.y = data.y || 0;
-    this.data.width = data.width || Figure.defaultSize;
-    this.data.height = data.height || Figure.defaultSize;
+    this.data = {
+      id: data.id || new Date().getTime(),
+      shape: data.shape,
+      x: data.x || 0,
+      y: data.y || 0,
+      width: data.width || Figure.defaultSize,
+      height: data.height || Figure.defaultSize
+    }
   }
+
+  get id(): number { return this.data.id }
 
   get x(): number { return this.data.x }
 
