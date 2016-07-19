@@ -3,11 +3,11 @@ import * as ReactDOM from "react-dom";
 import { createStore } from "redux";
 import { Provider } from "react-redux";
 
-import { figures } from "./redux/reducers";
+import { canvas } from "./redux/reducers";
 import { Editor } from "./components/editor";
 
 ReactDOM.render(
-  <Provider store={createStore(figures())}>
+  <Provider store={createStore(canvas)}>
     <Editor />
   </Provider>,
   document.getElementById('editor')
