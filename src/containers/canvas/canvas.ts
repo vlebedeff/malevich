@@ -1,20 +1,20 @@
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-import { CanvasState } from "../state";
-import * as Actions from "../actions";
+import { CanvasState } from "../../redux/state";
+import * as Actions from "../../redux/actions";
 import { TransformedFigure, Transform } from "../../models";
 
 import { Canvas, StateProps, DispatchProps } from "../../components/canvas/canvas";
 
 const mapStateToProps = (state: CanvasState): StateProps => {
   return {
-    figures: state.figures.map((figure) => {
+    figures: state.figures.present.list.map((figure) => {
       let transform: Transform;
-      if (state.selection.figureIds.indexOf(figure.id) == -1) {
+      if (state.figures.present.selected.indexOf(figure.id) == -1) {
         transform = { deltaX: 0, deltaY: 0 };
       } else {
-        transform = state.selection.transform;
+        transform = state.transform;
       }
       return new TransformedFigure(figure, transform);
     })
@@ -60,8 +60,16 @@ const mapDispatchToProps = (dispatch: Dispatch<CanvasState>): DispatchProps => {
 
     onCmdDown: () => {
       dispatch(Actions.bringToBottom());
+    },
+
+    onCmdZ: () => {
+      dispatch(Actions.undo());
+    },
+
+    onCmdShiftZ: () => {
+      dispatch(Actions.redo());
     }
   }
 }
 
-export const CanvasContainer = connect(mapStateToProps, mapDispatchToProps)(Canvas);
+export default connect(mapStateToProps, mapDispatchToProps)(Canvas);

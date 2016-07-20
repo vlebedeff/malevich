@@ -10,6 +10,8 @@ export const BRING_TO_FRONT = "BRING_TO_FRONT";
 export const BRING_TO_BOTTOM = "BRING_TO_BOTTOM";
 export const TRANSFORM_SELECTION = "TRANSFORM_SELECTION";
 export const APPLY_TRANSFORMATION = "APPLY_TRANSFORMATION";
+export const UNDO = "UNDO";
+export const REDO = "REDO";
 
 export interface AddFigureAction extends Action { figure: Figure }
 export function addFigure(shape: string, x: number, y: number): AddFigureAction {
@@ -68,4 +70,12 @@ export function transformSelection(transform: Transform): TransformSelectionActi
 
 export function applyTransformation(): Action {
   return { type: APPLY_TRANSFORMATION }
+}
+
+export function undo(): Action {
+  return { type: UNDO }
+}
+
+export function redo(): Action {
+  return { type: REDO }
 }

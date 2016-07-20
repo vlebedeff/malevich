@@ -1,45 +1,16 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { CanvasState } from "../../redux/state";
+import { CanvasState, Undoable } from "../../redux/state";
 
-interface SelectionProps {
+export interface SelectionProps {
   x: number,
   y: number,
   width: number,
-  height: number
-}
-interface ContainerProps {
+  height: number,
   onMouseDown: (e: MouseEvent) => void
 }
 
-const mapStateToProps = (state: CanvasState, ownProps: ContainerProps): SelectionProps & ContainerProps => {
-  if (state.selection.figureIds.length == 0) {
-    return { x: 0, y: 0, width: 0, height: 0, onMouseDown: ownProps.onMouseDown };
-  } else {
-    let x = Infinity;
-    let y = Infinity;
-    let bottomRightX = 0;
-    let bottomRightY = 0;
-    let selectedFigures = state.figures.filter(figure => state.selection.figureIds.indexOf(figure.id) != -1)
-    for (let figure of selectedFigures) {
-      x = Math.min(x, figure.x);
-      y = Math.min(y, figure.y);
-      bottomRightX = Math.max(bottomRightX, figure.x + figure.width);
-      bottomRightY = Math.max(bottomRightY, figure.y + figure.height);
-    }
-    const padding = 1;
-    const { deltaX, deltaY } = state.selection.transform;
-    return {
-      x: x + deltaX - padding,
-      y: y + deltaY - padding,
-      width: bottomRightX - x + padding * 2,
-      height: bottomRightY - y + padding * 2,
-      onMouseDown: ownProps.onMouseDown
-    }
-  }
-}
-
-class Selection extends React.Component<SelectionProps & ContainerProps, {}> {
+export class Selection extends React.Component<SelectionProps, {}> {
 
   public render(): JSX.Element {
     return (
@@ -53,5 +24,3 @@ class Selection extends React.Component<SelectionProps & ContainerProps, {}> {
     )
   }
 }
-
-export default connect(mapStateToProps, null)(Selection);

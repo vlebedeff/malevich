@@ -1,11 +1,17 @@
 import { Figure, Transform } from "../models";
 
-export interface SelectionState {
-  figureIds: number[],
-  transform: Transform
+export interface FigureState {
+  list: Array<Figure>,
+  selected: Array<number>
 }
 
 export interface CanvasState {
-  figures: Figure[],
-  selection: SelectionState
+  figures: Undoable<FigureState>,
+  transform: Transform
+}
+
+export interface Undoable<T> {
+  past: Array<T>,
+  present: T,
+  future: Array<T>
 }

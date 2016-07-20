@@ -1,24 +1,35 @@
 import { Action, Reducer } from "redux";
-import { CanvasState, SelectionState } from "./state";
+import { CanvasState, FigureState, Undoable } from "./state";
 import { Figure, Transform } from "../models";
 import * as Actions from "./actions";
 
-function figures(canvasState: CanvasState): Reducer<Array<Figure>> {
+function figures(canvasState: CanvasState): Reducer<FigureState> {
 
-  return (state: Figure[], action: Action) => {
+  return (
+    state: FigureState = { list: new Array<Figure>(), selected: new Array<number>() },
+    action: Action
+  ): FigureState => {
+
     switch(action.type) {
       case Actions.ADD_FIGURE:
         let newFigure = (<Actions.AddFigureAction>action).figure;
-        return [ ...state, newFigure]
+        return {
+          list: [...state.list, newFigure],
+          selected: [newFigure.id]
+        }
 
       case Actions.REMOVE_FIGURE:
         let removedId = (<Actions.RemoveFigureAction>action).id;
-        return state.filter(figure => figure.id != removedId)
+        return {
+          list: state.list.filter(figure => figure.id != removedId),
+          selected: state.selected.filter(id => id != removedId)
+        }
 
       case Actions.APPLY_TRANSFORMATION:
-        let { deltaX, deltaY } = canvasState.selection.transform;
-        return state.map((figure) => {
-            if (canvasState.selection.figureIds.indexOf(figure.id) != -1) {
+        let { deltaX, deltaY } = canvasState.transform;
+        return {
+          list: state.list.map((figure) => {
+            if (state.selected.indexOf(figure.id) != -1) {
               return new Figure({
                 id: figure.id,
                 shape: figure.shape,
@@ -28,19 +39,40 @@ function figures(canvasState: CanvasState): Reducer<Array<Figure>> {
             } else {
               return figure;
             }
-          })
+          }),
+          selected: state.selected
+        }
 
       case Actions.BRING_TO_FRONT:
-        return [
-          ...state.filter(figure => canvasState.selection.figureIds.indexOf(figure.id) == -1),
-          ...state.filter(figure => canvasState.selection.figureIds.indexOf(figure.id) != -1)
-        ]
+        return {
+          list: [
+            ...state.list.filter(figure => state.selected.indexOf(figure.id) == -1),
+            ...state.list.filter(figure => state.selected.indexOf(figure.id) != -1)
+          ],
+          selected: state.selected
+        }
 
       case Actions.BRING_TO_BOTTOM:
-        return [
-          ...state.filter(figure => canvasState.selection.figureIds.indexOf(figure.id) != -1),
-          ...state.filter(figure => canvasState.selection.figureIds.indexOf(figure.id) == -1)
-        ]
+        return {
+          list: [
+            ...state.list.filter(figure => state.selected.indexOf(figure.id) != -1),
+            ...state.list.filter(figure => state.selected.indexOf(figure.id) == -1)
+          ],
+          selected: state.selected
+        }
+
+      case Actions.SELECT_FIGURE:
+        let { id, exclusive } = (<Actions.SelectFigureAction>action);
+        return {
+          list: state.list,
+          selected: exclusive ? [id] : [ ...state.selected, id ]
+        }
+
+      case Actions.DESELECT_ALL:
+        return {
+          list: state.list,
+          selected: new Array<number>()
+        }
 
       default:
         return state
@@ -48,29 +80,7 @@ function figures(canvasState: CanvasState): Reducer<Array<Figure>> {
   }
 }
 
-function selectionFigureIds(state: number[], action: Action): number[] {
-    switch(action.type) {
-      case Actions.ADD_FIGURE:
-        let newFigure = (<Actions.AddFigureAction>action).figure;
-        return [newFigure.id]
-
-      case Actions.SELECT_FIGURE:
-        let { id, exclusive } = (<Actions.SelectFigureAction>action);
-        return exclusive ? [id] : [ ...state, id ]
-
-      case Actions.REMOVE_FIGURE:
-        let removedId = (<Actions.RemoveFigureAction>action).id;
-        return state.filter(id => id != removedId)
-
-      case Actions.DESELECT_ALL:
-        return new Array<number>()
-
-      default:
-        return state;
-    }
-}
-
-function selectionTransform(state: Transform, action: Action) {
+function transform(state: Transform = { deltaX: 0, deltaY: 0 }, action: Action) {
   switch(action.type) {
     case Actions.TRANSFORM_SELECTION:
       return (<Actions.TransformSelectionAction>action).transform;
@@ -83,22 +93,66 @@ function selectionTransform(state: Transform, action: Action) {
   }
 }
 
-const initialState = {
-  figures: new Array<Figure>(),
-  selection: {
-    figureIds: new Array<number>(),
-    transform: {
-      deltaX: 0,
-      deltaY: 0
-    }
+export default function canvas(state: CanvasState, action: Action): CanvasState {
+  return {
+    figures: undoable(figures(state))(state && state.figures, action),
+    transform: transform(state && state.transform, action)
   }
 }
-export function canvas(state: CanvasState = initialState, action: Action): CanvasState {
-  return {
-    figures: figures(state)(state.figures, action),
-    selection: {
-      figureIds: selectionFigureIds(state.selection.figureIds, action),
-      transform: selectionTransform(state.selection.transform, action)
+
+function undoable<T>(reducer: Reducer<T>): Reducer<Undoable<T>> {
+
+  return (state: Undoable<T>, action: Action): Undoable<T> => {
+    switch(action.type) {
+      case "@@redux/INIT":
+        return {
+          past: new Array<T>(),
+          present: reducer(undefined, action),
+          future: new Array<T>()
+        }
+      case Actions.SELECT_FIGURE:
+      case Actions.TRANSFORM_SELECTION:
+      case Actions.DESELECT_ALL:
+        return {
+          past: state.past,
+          present: reducer(state.present, action),
+          future: state.future
+        }
+
+      case Actions.UNDO:
+        if (state.past.length == 0) {
+          return state;
+        } else {
+          return {
+            past: [ ...state.past.slice(0, state.past.length - 1) ],
+            present: state.past[state.past.length - 1],
+            future: [ state.present, ...state.future ]
+          }
+        }
+
+      case Actions.REDO:
+        if (state.future.length == 0) {
+          return state;
+        } else {
+          return {
+            past: [ ...state.past, state.present ],
+            present: state.future[0],
+            future: state.future.slice(1)
+          }
+        }
+
+      default:
+        const newPresent = reducer(state.present, action);
+
+        if (newPresent === state.present) {
+          return state;
+        } else {
+          return {
+            past: [ ...state.past, state.present ],
+            present: newPresent,
+            future: new Array<T>()
+          }
+        }
     }
   }
 }

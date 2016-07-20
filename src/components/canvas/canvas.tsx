@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { CanvasFigure } from "./canvas_figure";
 import { TransformedFigure, Transform } from "../../models";
-import Selection from "./selection";
+import Selection from "../../containers/canvas/selection";
 
 export interface StateProps {
   figures: TransformedFigure[]
@@ -13,6 +13,8 @@ export interface DispatchProps {
   onDrop: (e: DragEvent, clientRect: ClientRect) => void,
   onCmdUp: () => void,
   onCmdDown: () => void,
+  onCmdZ: () => void,
+  onCmdShiftZ: () => void,
   onFigureMouseDown: (id: number, shiftKey: boolean) => void,
   onMove: (transform: Transform) => void,
   onMoveEnd: () => void,
@@ -40,7 +42,9 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
     this.stopListener = (e: MouseEvent) => {
       window.removeEventListener('mousemove', this.motionListener);
       window.removeEventListener('mouseup', this.stopListener);
-      this.props.onMoveEnd();
+      if (e.clientX != this.capturePoint.x || e.clientY != this.capturePoint.y) {
+        this.props.onMoveEnd();
+      }
     }
 
     window.onkeydown = (e: KeyboardEvent) => {
@@ -49,6 +53,12 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
       }
       if (e.keyCode == 40 && (e.metaKey || e.ctrlKey)) {
         this.props.onCmdDown();
+      }
+      if (e.key == "z" && (e.metaKey || e.ctrlKey)) {
+        this.props.onCmdZ();
+      }
+      if (e.key == "Z" && (e.metaKey || e.ctrlKey)) {
+        this.props.onCmdShiftZ();
       }
     }
   }
@@ -92,6 +102,9 @@ export class Canvas extends React.Component<StateProps & DispatchProps, {}> {
   }
 
   private startMotion = (e: MouseEvent) => {
+    if (e.button != 0) {
+      return;
+    }
     this.capturePoint = { x: e.clientX, y: e.clientY }
     window.addEventListener('mousemove', this.motionListener);
     window.addEventListener('mouseup', this.stopListener);
